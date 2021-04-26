@@ -8,15 +8,24 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using VGMToolbox.format;
 
 namespace CriDemuxer
 {
     public class Program
     {
         [JSInvokable]
-        public static Task<int[]> Demux()
+        public static async Task<string[]> Demux(string usmFilePath)
         {
-            return Task.FromResult(new int[] { 1, 2, 3 });
+            MpegStream.DemuxOptionsStruct demuxOptions = new MpegStream.DemuxOptionsStruct();
+            demuxOptions.ExtractAudio = true;
+            demuxOptions.ExtractVideo = true;
+
+            CriUsmStream demuxer = new CriUsmStream(usmFilePath);
+            return await Task.Run(() =>
+            {
+                return demuxer.DemultiplexStreams(demuxOptions);
+            });
         }
         public static async Task Main(string[] args)
         {
