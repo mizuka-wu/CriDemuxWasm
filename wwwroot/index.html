@@ -5,11 +5,42 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>CriDemuxer</title>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js"></script>
     <base href="/" />
 </head>
 
 <body>
+    <input accept=".usm" type="file" />
     <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        const ffmpeg = FFmpeg.createFFmpeg({ log: true });
+        ffmpeg.load()
+        document.querySelector('input').onchange = function (e) {
+            const file = e.target.files[0]
+            e.target.vlaue = ''
+            getDemuxFiles(file)
+        }
+
+        function getDemuxFiles(file) {
+            if (file) {
+                const filePath = `./${file.name}`
+                const fileRreader = new FileReader()
+                fileRreader.onload = () => {
+                    window.FS.writeFile(filePath, new Uint8Array(fileRreader.result))
+                    DotNet.invokeMethodAsync("CriDemuxer", "Demux", filePath)
+                        .then(files => {
+                            const [m2v] = files
+                            ffmpeg.FS('writeFile', m2v, window.FS.readFile(m2v))
+                            return ffmpeg.run('-i', m2v, m2v.replace('.m2v', '.webm'))
+                        })
+                        .then((result) => {
+                            console.log(result)
+                        })
+                }
+                fileRreader.readAsArrayBuffer(file)
+            }
+        }
+    </script>
 </body>
 
 </html>
