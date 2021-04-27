@@ -9,7 +9,7 @@ This Project use CriDemuxerCore and blazor to demux usm file online
 1. clone this project
 2. install dotnet
 3. run build.sh
-4. the file is in bin/Release/net5.0/wwwroot/_framework
+4. the file is in `bin/Release/net5.0/wwwroot/_framework`
 
 ### Use cdn
 
