@@ -20,6 +20,7 @@ namespace CriDemuxer
 
             return await Task.Run(() =>
             {
+                Console.WriteLine("Start demux " + usmFilePath);
                 MpegStream.DemuxOptionsStruct demuxOptions = new MpegStream.DemuxOptionsStruct();
                 demuxOptions.ExtractAudio = true;
                 demuxOptions.ExtractVideo = true;
