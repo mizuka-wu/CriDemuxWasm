@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CriDemuxer</title>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js"></script>
+    <base href="/" />
+</head>
+
+<body>
+    <input disabled accept=".usm" type="file" />
+    <video controls></video>
+    <script src="./_framework/blazor.webassembly.js"></script>
+    <script>
+        const ffmpeg = FFmpeg.createFFmpeg({ log: true });
+        ffmpeg.load()
+            .then(() => {
+                const input = document.querySelector('input')
+                input.disabled = false
+                input.onchange = function (e) {
+                    const file = e.target.files[0]
+                    e.target.vlaue = ''
+                    getDemuxFiles(file)
+                        .then(files => {
+                            const [m2v] = files
+                            ffmpeg.FS('writeFile', m2v, window.FS.readFile(m2v))
+                            return ffmpeg.run('-i', m2v, 'result.mp4')
+                        })
+                        .then(() => {
+                            const url = URL.createObjectURL(new Blob([ffmpeg.FS('readFile', 'result.mp4')], { type: 'video/mp4' }))
+                            document.querySelector('video').src = url
+                        })
+                }
+            })
+
+        function getDemuxFiles(file) {
+            if (file) {
+                const filePath = `./${file.name}`
+                const fileRreader = new FileReader()
+                return new Promise(resolve => {
+                    fileRreader.onload = () => {
+                        window.FS.writeFile(filePath, new Uint8Array(fileRreader.result))
+                        resolve(DotNet.invokeMethodAsync("CriDemuxer", "Demux", filePath))
+                    }
+                    fileRreader.readAsArrayBuffer(file)
+                })
+            } else {
+                throw new Error("no file")
+            }
+        }
+    </script>
+</body>
+
+</html>
