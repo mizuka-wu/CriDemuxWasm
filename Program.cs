@@ -17,13 +17,13 @@ namespace CriDemuxer
         [JSInvokable]
         public static async Task<string[]> Demux(string usmFilePath)
         {
-            MpegStream.DemuxOptionsStruct demuxOptions = new MpegStream.DemuxOptionsStruct();
-            demuxOptions.ExtractAudio = true;
-            demuxOptions.ExtractVideo = true;
 
-            CriUsmStream demuxer = new CriUsmStream(usmFilePath);
             return await Task.Run(() =>
             {
+                MpegStream.DemuxOptionsStruct demuxOptions = new MpegStream.DemuxOptionsStruct();
+                demuxOptions.ExtractAudio = true;
+                demuxOptions.ExtractVideo = true;
+                CriUsmStream demuxer = new CriUsmStream(usmFilePath);
                 return demuxer.DemultiplexStreams(demuxOptions);
             });
         }
