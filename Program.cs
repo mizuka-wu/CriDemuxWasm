@@ -18,7 +18,7 @@ namespace CriDemuxer
         public static async Task<string[]> Demux(string usmFilePath)
         {
             MpegStream.DemuxOptionsStruct demuxOptions = new MpegStream.DemuxOptionsStruct();
-            demuxOptions.ExtractAudio = false;
+            demuxOptions.ExtractAudio = true;
             demuxOptions.ExtractVideo = true;
 
             CriUsmStream demuxer = new CriUsmStream(usmFilePath);
